@@ -1,0 +1,25 @@
+﻿生成启动时间为 2014/9/19 11:24:21。
+     1>项目“F:\vs代码\小学期项目\Serverdatabase\Serverdatabase\Serverdatabase.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         D:\development_enviroment\vs2012\vs2012程序\VC\bin\CL.exe /c /ID:\dailyprograme\xampp\xampp\mysql\lib /ID:\dailyprograme\xampp\xampp\mysql\include /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /D _AFXDLL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt connectdatabase.cpp
+         connectdatabase.cpp
+     1>f:\vs代码\小学期项目\serverdatabase\serverdatabase\connectdatabase.cpp(32): error C2664: “std::basic_string<_Elem,_Traits,_Alloc>::basic_string(const std::basic_string<_Elem,_Traits,_Alloc> &)”: 不能将参数 1 从“unsigned char [50]”转换为“const std::basic_string<_Elem,_Traits,_Alloc> &”
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+                 原因如下: 无法从“unsigned char [50]”转换为“const std::basic_string<_Elem,_Traits,_Alloc>”
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+                 无构造函数可以接受源类型，或构造函数重载决策不明确
+     1>已完成生成项目“F:\vs代码\小学期项目\Serverdatabase\Serverdatabase\Serverdatabase.vcxproj”(Build 个目标)的操作 - 失败。
+
+生成失败。
+
+已用时间 00:00:01.17
