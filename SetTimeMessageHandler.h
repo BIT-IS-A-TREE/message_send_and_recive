@@ -1,0 +1,88 @@
+#ifndef _SETTIMEMESSAGEHANDLER_H_
+#define _SETTIMEMESSAGEHANDLER_H_
+
+#include "Message.h"
+#include "User.h"
+#include "SystemHead.h"
+#include "Translation.h"
+
+
+class SetTimeMessageHandler
+{
+
+private:
+	//static priority_queue<Message> SetTimeMessageQueue;
+	static Message SetTimeMessageQueue[1000];
+	static CRITICAL_SECTION selfCritical;
+	static int SetTimeMessageQueueTop;
+	static DWORD WINAPI CheckTime(LPVOID arg)
+	{
+		while (1)
+		{
+			time_t nowTime;
+			if (SetTimeMessageQueueTop!=0)
+			{
+				EnterCriticalSection(&selfCritical);		
+				Message	headMessage=SetTimeMessageQueue[SetTimeMessageQueueTop];			
+				LeaveCriticalSection(&selfCritical);
+				//取出定时短信队首。
+
+				if (headMessage.time==nowTime)
+				{
+					headMessage.setTime=false;
+					EnterCriticalSection(&critical);
+					msgToBeDealed[rear]=TranslationHandler::messageToString(headMessage);
+					rear++;
+					LeaveCriticalSection(&critical);
+					//添加到处理队列
+
+					EnterCriticalSection(&selfCritical);
+					SetTimeMessageQueueTop--;
+					LeaveCriticalSection(&selfCritical);
+					//修改定时短信队列
+				}
+			}
+			Sleep(10);
+		}
+	}
+
+	static int cmp(const void *a,const void *b)
+	{
+		Message *a1=(Message *)a;
+		Message *b1=(Message *)b;
+		return a1->time-b1->time;
+	}
+public:
+	static void startWorking()
+	{
+		Sleep(5);
+		InitializeCriticalSection(&selfCritical);
+		HANDLE Handler=CreateThread(NULL,0,CheckTime,NULL,0,NULL);//应该是不会结束掉的
+		printf("定时短信处理模块开始运行！\n");
+	}
+
+
+	static void addMessage(Message o)
+	{
+		EnterCriticalSection(&selfCritical);
+		SetTimeMessageQueue[SetTimeMessageQueueTop]=o;
+		SetTimeMessageQueueTop++;
+		qsort(SetTimeMessageQueue,SetTimeMessageQueueTop,sizeof(Message),cmp);
+		LeaveCriticalSection(&selfCritical);
+	}
+};
+Message SetTimeMessageHandler::SetTimeMessageQueue[1000];
+CRITICAL_SECTION SetTimeMessageHandler::selfCritical;
+int SetTimeMessageHandler::SetTimeMessageQueueTop=0;
+
+
+
+
+
+
+
+
+
+
+
+#endif
