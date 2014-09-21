@@ -1,156 +1,143 @@
-#ifndef _SERVER_H_
-#define _SERVER_H_
+#ifndef _COMMUNICATIONHANDLER_H_
+#define _COMMUNICATIONHANDLER_H_
 #include "User.h"
-#include "SystemHead.h"
-#include "CommunicationHandler.h"
 #include "Message.h"
-#include "OfflineMessageHandler.h"
-#include "CommunicationHandlerList.h"
-#include "SetTimeMessageHandler.h"
+#include "SystemHead.h"
 
-#include "Translation.h"
-
-class Server
+class CommunicationHandler
 {
 
 private:
-	
-	static OfflineMessageHandler myOfflineMessageHandler;
-	static SetTimeMessageHandler mySetTimeMessageHandler;
-
-
-
-	static void Decode(string o)//这个地方都是要改的，
+	CRITICAL_SECTION selfCritical;
+	bool endFlag;
+	static void Sending(void *arg)
 	{
-		//比如说第一个是发送。
-		if (strcmp(o.c_str(),"Online")==0)//上线
+		CommunicationHandler *This=(CommunicationHandler *)arg;
+		printf("同客户端：%s发送数据的通道已建立\n",inet_ntoa(This->addrClient.sin_addr));
+		memset(This->msgToSend,0,sizeof(This->msgToSend));
+		strcpy(This->msgToSend,"你好朋友！\n");
+		while (!This->endFlag)//这个地方可能要加critical
 		{
-			char arg[1000];//假设就是Ip
-			strcpy(arg,o.c_str());
-			queue<Message> tempQueue=myOfflineMessageHandler.getMessage(arg);
-			CommunicationHandler CM=myCommunicationHandlerList.getHandler(arg);
-			while (!tempQueue.empty())
+			EnterCriticalSection(&This->selfCritical);
+			if (strlen(This->msgToSend)!=0)
 			{
-				CM.sendInformation(tempQueue.front());
-				tempQueue.pop();
+				send(This->sockClient,This->msgToSend,strlen(This->msgToSend)+1,0);
+				printf("向客户端%s发送数据：%s\n",inet_ntoa(This->addrClient.sin_addr),This->msgToSend);
+				memset(This->msgToSend,0,sizeof(This->msgToSend));
 			}
+			LeaveCriticalSection(&This->selfCritical);
+			Sleep(10);
 		}
-		if (strcmp(o.c_str(),"Send")==0)//发送
-		{
-			if (strcmp(o.c_str(),"SetTime")==0)//定时短信。
-			{
-				;
-			}
 
+	//	Sleep(10);
+	//	shutdown(This->sockClient,1);
 
-			//int CheckOnline=check();
-			//if (online)
-			//{
-			//	send;
-			//}
-			//else
-			//{
-			//	myOfflienMessageHandler.addMessage();
-			//}
-		}
-		
-	
+		printf("发送线程退出！\n");
 	}
-
-	static DWORD WINAPI WaitForConnection(LPVOID pParam)
+	static void Recieving(void * arg)
 	{
-		Sleep(50);
-	while (1)
+		CommunicationHandler *This=(CommunicationHandler *)arg;
+		printf("用于接收客户端：%s数据的通道已建立\n",inet_ntoa(This->addrClient.sin_addr));//打印格式化IP地址,这个地方要写出friend
+		while (!This->endFlag)
 		{
-		printf("启动监听\n");
-		int len=sizeof(SOCKADDR);
-		SOCKADDR_IN addrClient;
-		SOCKET sockClient=accept(serSocket,(SOCKADDR*)&addrClient,&len);
-		printf("检测到连接请求！\n");
-		CommunicationHandler CH(serSocket,sockClient,addrClient);
-		CH.startConnecting();
-		myCommunicationHandlerList.push_back(CH);
-
-	//	Sleep(1000);
-	//	CH.endSocket();
-
-
-		//CommunicationHandler *CM=&CH;
-		//CM->startConnecting();
-		//CH.startConnecting(serSocket,sockClient,addrClient);
-		/*struct arg Arg;
-		Arg.addrClient=addrClient;
-		Arg.Client=sockClient;
-		Arg.Server=serSocket;
-		unsigned int ID;
-		HANDLE hHandle =(HANDLE)_beginthreadex(NULL,0,CH.startConnecting,&Arg,0,&ID);*/
-		}
-	}
-	static DWORD WINAPI dealMessage(LPVOID pParam)
-	{
-		Sleep(2);
-		printf("短信处理模块开始运行！\n");
-		while (1)
-		{
-			EnterCriticalSection(&critical);
-			while (head!=rear)//队列不为空
-			{
-				string temp=msgToBeDealed[head];
-				head++;
-				Decode(temp);
-			}
-			head=rear=0;
+			char buf[10000]; 
+			recv(This->sockClient,buf,10000,0);
+			printf("从客户端%s接收到数据：%s\n",inet_ntoa(This->addrClient.sin_addr),buf);
+			EnterCriticalSection(&critical);//全局critical
+			msgToBeDealed[rear]=string(buf);
+			rear++;
 			LeaveCriticalSection(&critical);
-			Sleep(20);
+			Sleep(10);
 		}
+
+		
+		//shutdown(This->sockClient,0);
+
+		printf("接收线程退出！\n");
 	}
-
-
-public:
-	static SOCKET serSocket;
-	static CommunicationHandlerList myCommunicationHandlerList;
-	
-	
-
-
-
-	void startServer()
+	static void Connecting(void *arg)
 	{
-		WORD myVersionRequest;
-		WSADATA wsaData;
-		myVersionRequest=MAKEWORD(1,1);
-		int err;
-		err=WSAStartup(myVersionRequest,&wsaData);
-		if (!err)
-		{
-			printf("已打开套接字\n");
+		
 
-		} 
-		else
-		{
-			printf("打开套接字失败！\n");
-			return ;
-		}
-		serSocket=socket(AF_INET,SOCK_STREAM,0);//妈的注意这句话的位置！
-		SOCKADDR_IN addr;
-		addr.sin_family=AF_INET;
-		addr.sin_addr.S_un.S_addr=inet_addr("127.0.0.1");//服务器IP地址
-		addr.sin_port=htons(6000);//port
-		bind(serSocket,(SOCKADDR*)&addr,sizeof(SOCKADDR_IN));
-		listen(serSocket,10);
-		printf("服务器启动成功！\n");
-		HANDLE ConnectionHandler=CreateThread(NULL,0,WaitForConnection,NULL,0,NULL);
-		HANDLE MessageHandler=CreateThread(NULL,0,dealMessage,NULL,0,NULL);
-		mySetTimeMessageHandler.startWorking();
-		while (1)
+
+		CommunicationHandler * This=(CommunicationHandler *)arg;
+
+		This->endFlag=false;
+		memset(This->msgToSend,0,sizeof(This->msgToSend));
+		InitializeCriticalSection(&This->selfCritical);
+
+
+
+
+		printf("客户端%s已连接上\n",inet_ntoa(This->addrClient.sin_addr));
+		This->startRecieving();
+		This->startSending();
+		while (!This->endFlag)
 		{
 			;
 		}
+		Sleep(1000);
+		
+	//	shutdown(This->sockClient,3);
+		closesocket(This->sockClient);//这个地方close会出错，再考虑考虑。
+		
+		printf("主线程退出！\n");
+		Sleep(1000);
 	}
+	int startSending()
+	{
+		return _beginthread(Sending,0,(void *)this);
+	}
+	int startRecieving()
+	{
+		return _beginthread(Recieving,0,(void *)this);
+	}
+	
+public:
+	SOCKET sockClient,sockServer;
+	char msgToSend[10000];
+	SOCKADDR_IN addrClient;
+	CommunicationHandler(SOCKET serSocket,SOCKET client,SOCKADDR_IN addr);
+	
+	void sendInformation(string o)
+	{
+		EnterCriticalSection(&this->selfCritical);
+		strcpy(msgToSend,o.c_str());
+		LeaveCriticalSection(&this->selfCritical);
+	}
+	void sendInformation(Message o)
+	{
+		;
+	}
+	void sendInformation(char * o)
+	{
+		//string temp(o);
+		EnterCriticalSection(&this->selfCritical);
+		strcpy(msgToSend,o);
+		LeaveCriticalSection(&this->selfCritical);
+	}
+	void endSocket()
+	{
+		endFlag=true;
+	}
+
+	int startConnecting()
+	{
+		return _beginthread(Connecting,0,(void *)this);
+	}
+	
+	
 };
-SOCKET Server::serSocket;
-CommunicationHandlerList Server::myCommunicationHandlerList;
-OfflineMessageHandler Server::myOfflineMessageHandler;
-SetTimeMessageHandler Server::mySetTimeMessageHandler;
+
+
+
+CommunicationHandler::CommunicationHandler(SOCKET serSocket,SOCKET client,SOCKADDR_IN addr)//先要声明一次。
+{
+	this->endFlag=false;
+	this->addrClient=addr;
+	this->sockClient=client;
+	this->sockServer=serSocket;
+}
+
 
 #endif
