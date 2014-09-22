@@ -11,7 +11,8 @@ public:
 	int lmesFlag;//短信标识，0表示短短信，x表示本条长短信一共有x条
 	int lmesSt;//长短信顺序标记，0表示短短信，x表示本条短信为长短信的第x条
 	time_t time;//收发时间
-	bool setTime;
+	time_t setTime;
+	int IssetTime;//0表示非定时，1表示定时。
 public:
 	bool storeMessage();//存储新短信；返回是否成功;
 	friend bool operator< (Message a,Message b)
