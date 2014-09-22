@@ -1,5 +1,6 @@
-#include "Server.h"
 #include "Database.h"
+#include "Server.h"
+
 int head,rear;
 string msgToBeDealed[1000];//string数组
 CRITICAL_SECTION critical;
@@ -14,7 +15,8 @@ int main()
 	Server myServer;
 	head=rear=0;
 	InitializeCriticalSection(&critical);
-	Database *myDatabase=new Database();
+	Database *myDatabase;
+	myDatabase=new Database();
 	myServer.startServer();
 
 	
