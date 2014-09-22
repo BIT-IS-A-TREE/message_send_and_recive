@@ -92,10 +92,27 @@ private:
 				}//把内容都存起来
 				strcpy(o.content,temp.c_str());
 				//短信内容保存完毕！
-				
-				//在线！查找CM,发送
-				//不在线，调出OFFline，加入
 
+				
+				Database::storemessage(o);//存入数据库
+				string ans=Database::return_ip_by_telephonenumber(string(o.receiver));//查询指定ip状况
+				if (ans=="1.1.1.1")//不在线，调出OFFline，加入
+				{
+					myOfflineMessageHandler.addMessage(o);//加入完毕
+				}
+				else if (ans!="0.0.0.0")//存在且在线
+				{
+					char temp[1000];
+					memset(temp,0,sizeof(temp));
+					strcpy(temp,ans.c_str());
+					CommunicationHandler CM=myCommunicationHandlerList.getHandler(temp);//找到指定的客户端
+					CM.sendInformation(o);
+				}
+				else
+				{
+					printf("短信接收用户不存在！\n");
+				}
+				
 
 			}
 			else if (strcmp(token,"1")==0)//定时
@@ -125,21 +142,88 @@ private:
 				strcpy(o.content,temp.c_str());
 				//短信内容保存完毕！
 
-
+				Database::storemessage(o);//短信存入数据库
 				//加入到定时短信队列！
 				mySetTimeMessageHandler.addMessage(o);
 
 			}
 			else
 			{
-				printf("解析定时时报错！\n");
+				printf("解析短信时报错！\n");
 				return ;
 			}
 			return ;
+		}//短信部分解析完毕
+
+		//登陆加解密顺序:Login@用户名@密码@IP
+		if (strcmp(token,"Login")==0)
+		{
+			User o;
+			token = strtok (NULL, "@");
+			strcpy(o.username,token);//username
+			token = strtok (NULL, "@");
+			strcpy(o.password,token);//password
+			token = strtok (NULL, "@");
+			strcpy(o.ip,token);//ip;
+
+			//查询用户名密码是否正确。
+			if (Database::checklogin(o)==1)//正确，IP上线
+			{
+				return ;
+			}
+			else
+			{
+				printf("用户登录失败！\n");
+			}
+			return ;
 		}
-	//	if (strcmp(token,""))
 
+		//注册加解密顺序:Register@用户名@密码@IP
+		if (strcmp(token,"Register")==0)
+		{
+			User o;
+			token = strtok (NULL, "@");
+			strcpy(o.username,token);//username
+			token = strtok (NULL, "@");
+			strcpy(o.password,token);//password
+			token = strtok (NULL, "@");
+			strcpy(o.ip,token);//ip;
 
+			//查询是否可以注册
+			if (Database::checkregister(o)==1)//正确，允许注册
+			{
+				return ;
+			}
+			else
+			{
+				printf("用户注册失败\n");
+			}
+			return ;
+		}
+
+		//回执加密顺序Repeat@IP@内容
+		if (strcmp(token,"Repeat")==0)
+		{
+			token = strtok (NULL, "@");
+			char IP[100];
+			memset(IP,0,sizeof(IP));
+			strcpy(IP,token);
+			token = strtok (NULL, "@");
+			printf("接收到客户端%s的回执：%s\n",IP,token);
+		}
+
+		//下线信息提醒Logout@username@password@ip
+		if (strcmp(token,"Logout")==0)
+		{
+			User o;
+			token = strtok (NULL, "@");
+			strcpy(o.username,token);//username
+			token = strtok (NULL, "@");
+			strcpy(o.password,token);//password
+			token = strtok (NULL, "@");
+			strcpy(o.ip,token);//ip;
+			Database::logout(o);
+		}
 		
 	
 	}
