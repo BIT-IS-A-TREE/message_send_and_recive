@@ -95,6 +95,7 @@ private:
 				if (ans=="1.1.1.1")//不在线，调出OFFline，加入
 				{
 					myOfflineMessageHandler.addMessage(o);//加入完毕
+					printf("加入离线队列\n");
 				}
 				else if (ans!="0.0.0.0")//存在且在线
 				{
@@ -160,6 +161,15 @@ private:
 			//查询用户名密码是否正确。
 			if (Database::checklogin(o)==1)//正确，IP上线
 			{
+
+				queue<Message> tempQueue=myOfflineMessageHandler.getMessage(o.username);
+				while (!tempQueue.empty())
+				{
+					Message tempMessage=tempQueue.front();
+					CommunicationHandler CM=myCommunicationHandlerList.getHandler(o.ip);
+					CM.sendInformation(tempMessage);
+					tempQueue.pop();
+				}
 				return ;
 			}
 			else
@@ -307,7 +317,7 @@ public:
 		serSocket=socket(AF_INET,SOCK_STREAM,0);//妈的注意这句话的位置！
 		SOCKADDR_IN addr;
 		addr.sin_family=AF_INET;
-		addr.sin_addr.S_un.S_addr=inet_addr("127.0.0.1");//服务器IP地址
+		addr.sin_addr.S_un.S_addr=inet_addr("10.4.20.138");//服务器IP地址
 		addr.sin_port=htons(6000);//port
 		bind(serSocket,(SOCKADDR*)&addr,sizeof(SOCKADDR_IN));
 		listen(serSocket,10);
