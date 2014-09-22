@@ -107,7 +107,9 @@ public:
 	}
 	void sendInformation(Message o)
 	{
-		;
+		EnterCriticalSection(&this->selfCritical);
+		strcpy(msgToSend,o.content);
+		LeaveCriticalSection(&this->selfCritical);;
 	}
 	void sendInformation(char * o)
 	{
