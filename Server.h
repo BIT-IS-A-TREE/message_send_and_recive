@@ -83,19 +83,15 @@ private:
 				o.lmesSt=atoi(token);//长短信顺序标识
 				token = strtok (NULL, "@");
 				o.time=atoi(token);//收发时间
-				token =strtok(NULL,"@");
-				string temp="";
-				while (token!=NULL)
-				{
-					temp+=string(token);
-					token =strtok(NULL,"@");
-				}//把内容都存起来
-				strcpy(o.content,temp.c_str());
+
+				token =strtok(NULL,"");//短信内容
+				strcpy(o.content,token);
 				//短信内容保存完毕！
+				
 
 				
 				Database::storemessage(o);//存入数据库
-				string ans=Database::return_ip_by_telephonenumber(string(o.receiver));//查询指定ip状况
+				string ans=Database::return_ip_by_telephonenumber(string(o.receiver));//查询指定ip状况，查询发现是0.0.0.0。未注册！！！
 				if (ans=="1.1.1.1")//不在线，调出OFFline，加入
 				{
 					myOfflineMessageHandler.addMessage(o);//加入完毕
@@ -132,14 +128,9 @@ private:
 				o.lmesSt=atoi(token);//长短信顺序标识
 				token = strtok (NULL, "@");
 				o.time=atoi(token);//收发时间
-				token =strtok(NULL,"@");
-				string temp="";
-				while (token!=NULL)
-				{
-					temp+=string(token);
-					token =strtok(NULL,"@");
-				}//把内容都存起来
-				strcpy(o.content,temp.c_str());
+
+				token =strtok(NULL,"");//短信内容
+				strcpy(o.content,token);
 				//短信内容保存完毕！
 
 				Database::storemessage(o);//短信存入数据库
@@ -208,8 +199,18 @@ private:
 			char IP[100];
 			memset(IP,0,sizeof(IP));
 			strcpy(IP,token);
-			token = strtok (NULL, "@");
+
+			
+			token = strtok (NULL, "");
+			//temp+=string(token);
+			//while (token!=NULL)
+			//{
+			//token = strtok (NULL, "@");
+			//temp+=string(token);
+			//}
+			//读取后面所有的信息，不被@中断
 			printf("接收到客户端%s的回执：%s\n",IP,token);
+			return ;
 		}
 
 		//下线信息提醒Logout@username@password@ip
@@ -223,6 +224,7 @@ private:
 			token = strtok (NULL, "@");
 			strcpy(o.ip,token);//ip;
 			Database::logout(o);
+			return ;
 		}
 		
 	
