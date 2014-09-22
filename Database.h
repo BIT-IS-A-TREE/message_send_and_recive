@@ -1,19 +1,12 @@
 #ifndef _DATABASE_H_
 #define _DATABASE_H_
 
-#include <string.h> 
-#include <stdlib.h> 
-#include <stdio.h> 
-#include <winsock2.h> 
-#include <mysql.h>/*注意要包含这个头文件*/ 
-#include <string>
-#include<cstdio>
-#include<ctime>
+
 #include "User.h"
 #include "Message.h"
 #include "SystemHead.h"
 /*定义了一些数据库连接需要的宏*/ 
-using namespace std;
+
 
 #define HOST "localhost" 
 #define USERNAME "root" 
@@ -240,7 +233,7 @@ private:
 		} 
 	}
 
-	
+	}
 };
 
 #endif
