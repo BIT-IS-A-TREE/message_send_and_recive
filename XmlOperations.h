@@ -1,5 +1,6 @@
 #include "tinyxml.h" // TinyXML的头文件
 #include<iostream>
+#include<algorithm>
 #include<stdio.h>
 #include<string.h>
 #include<tchar.h>
@@ -26,3 +27,4 @@ public:
 	void delateAllLinkManMes(char *);//删除联系人的所有短信
 	void delateMessage(char *,int );//删除短信
 };
+
