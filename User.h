@@ -1,5 +1,8 @@
+
+
 class User{
 public:
-    char phoneNumber[30];
-    char key[30];
+    char ip[50];
+    char username[30];
+    char password[30];
 };
