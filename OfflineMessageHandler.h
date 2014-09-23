@@ -26,6 +26,30 @@ public:
 		//待完善。
 		return NameMessage;
 	}
+
+	void deleteMessage(char Name[])
+	{
+		queue<Message> temp;
+		while (!myOfflineMessageList.empty())//先删除
+		{
+			Message tempMessage=myOfflineMessageList.front();
+			myOfflineMessageList.pop_front();
+			if (strcmp(tempMessage.receiver,Name)==0)
+			{
+				continue;//这条消息不要了
+			}
+			else
+			{
+				temp.push(tempMessage);
+			}
+		}
+		while (!temp.empty())
+		{
+			myOfflineMessageList.push_back(temp.front());
+			temp.pop();
+		}
+	}
+
 	void addMessage(Message o)
 	{
 		myOfflineMessageList.push_back(o);
