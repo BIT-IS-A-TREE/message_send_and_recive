@@ -66,6 +66,7 @@ void XmlOperations :: creatXml(char * fileName)
 
 void XmlOperations :: openXml(char * fileName)
 {
+    pDoc = new TiXmlDocument;
 	pDoc->LoadFile(fileName);
 }
 
@@ -178,7 +179,7 @@ void XmlOperations :: addMessage(char * tempPhoneNumber,Message tempMessage)
 	TiXmlElement *pMessageTime = new TiXmlElement(_T("time"));
 	TiXmlText *MessageTime = new TiXmlText(ctime(&tempMessage.time));
 	pMessageTime->LinkEndChild(MessageTime);
-	pMessage->LinkEndChild(MessageTime);
+    pMessage->LinkEndChild(pMessageTime);
 	//链接整个短信                                
 	pMessages->LinkEndChild(pMessage);
 	//修改短信数目
