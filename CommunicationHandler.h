@@ -111,17 +111,7 @@ public:
 	void sendMessage(Message o)
 	{
 		//短信加解密顺序：Message@是否定时@定时时间@收件人@发件人@发送标识@短信标识@长短信顺序标识@收发时间@内容   如果不是定时短信定时时间可以随便设定，反正最后也不会调用这个属性
-		string temp;
-		temp="Message@";
-		temp+=o.IssetTime +"@";
-		temp+=o.setTime+'@';
-		temp+=o.receiver+'@';
-		temp+=o.sender+'@';
-		temp+=o.sendRceiveFlag+'@';
-		temp+=o.lmesFlag+'@';
-		temp+=o.lmesSt+'@';
-		temp+=o.time+'@';
-		temp+=o.content;
+		string temp=TranslationHandler::messageToString(o);
 		EnterCriticalSection(&this->selfCritical);
 		strcpy(msgToSend,temp.c_str());
 		LeaveCriticalSection(&this->selfCritical);;
