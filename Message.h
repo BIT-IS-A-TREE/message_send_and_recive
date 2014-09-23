@@ -14,6 +14,6 @@ public:
     time_t setTime;//定时的时间
 	time_t time;//收发时间
 public:
-	bool storeMessage();//存储新短信；返回是否成功;
+    void storeMessage();//存储新短信；
 };
 
