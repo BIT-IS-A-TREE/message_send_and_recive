@@ -15,11 +15,11 @@ private:
 	static Message SetTimeMessageQueue[1000];
 	static CRITICAL_SECTION selfCritical;
 	static int SetTimeMessageQueueTop;
-	static DWORD WINAPI CheckTime(LPVOID arg)
+	static DWORD WINAPI CheckTime(LPVOID arg)//定时短信部分需要Check
 	{
 		while (1)
 		{
-			time_t nowTime;
+			time_t nowTime;//未初始化
 			if (SetTimeMessageQueueTop!=0)
 			{
 				EnterCriticalSection(&selfCritical);		
@@ -27,9 +27,11 @@ private:
 				LeaveCriticalSection(&selfCritical);
 				//取出定时短信队首。
 
-				if (headMessage.time==nowTime)
+				localtime(&nowTime);//读取本地时间。
+
+				if (headMessage.setTime==nowTime)
 				{
-					headMessage.setTime=false;
+					headMessage.IssetTime=false;
 					EnterCriticalSection(&critical);
 					msgToBeDealed[rear]=TranslationHandler::messageToString(headMessage);
 					rear++;
@@ -50,7 +52,7 @@ private:
 	{
 		Message *a1=(Message *)a;
 		Message *b1=(Message *)b;
-		return a1->time-b1->time;
+		return a1->setTime-b1->setTime;
 	}
 public:
 	static void startWorking()
