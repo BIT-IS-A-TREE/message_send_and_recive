@@ -1,6 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
+#include <QListWidget>
 #include <QMainWindow>
 
 namespace Ui {
@@ -23,6 +23,8 @@ private slots:
     void on_searchButton_clicked();
 
     void on_deleteButton_clicked();
+
+    void on_messagelistWidget_itemDoubleClicked(QListWidgetItem *item);
 
 private:
     Ui::MainWindow *ui;
