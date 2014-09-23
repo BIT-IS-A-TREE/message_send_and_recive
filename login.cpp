@@ -36,7 +36,7 @@ int judgeIfLegal(string a,string b)
     if(len!=11) return 1;
     for(int i=0;i<11;i++)
     {
-        if(a[i]<='0' || a[i]>='9')
+        if(a[i]<'0' || a[i]>'9')
         {
             flag=1;
             break;
@@ -75,17 +75,19 @@ void Login::on_loginButton_clicked()
     else
     {
         User newUser;
-        strcpy(newUser.phoneNumber,pnumber);
-        strcpy(newUser.key,ppassword);
+        strcpy(newUser.username,pnumber);
+        strcpy(newUser.password,ppassword);
         ;//函数，loginSend(number,password);用户登录，返回1登录成功，返回2密码不正确
         int temp=1;//赋值为上面函数返回值*************
         if(temp==1)
         {
-            strcpy(myXml.fileName,pnumber);
-            myXml.openXml(pnumber);
-            myList.creatLinkManList();
+           myXml.fileName = pnumber;
+           myXml.openXml(pnumber);
+           myList.creatLinkManList();
             ;//读取用户本地数据
-            accept();
+           this->close();
+           MainWindow *w=new MainWindow();
+           w->show();
         }
         else
             ui->hintlabel1->setText(Hint3);
@@ -123,8 +125,8 @@ void Login::on_registerButton_clicked()
     else
     {
         User newUser;
-        strcpy(newUser.phoneNumber,pnumber);
-        strcpy(newUser.key,ppassword);
+        strcpy(newUser.username,pnumber);
+        strcpy(newUser.password,ppassword);
         ;//函数，regSend(User newUser);注册用户，返回1注册成功，返回2电话已存在
         int temp=1;//赋值为上面函数返回值*************
         if(temp==1)
