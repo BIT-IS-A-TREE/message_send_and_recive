@@ -102,8 +102,8 @@ private:
 					char temp[1000];
 					memset(temp,0,sizeof(temp));
 					strcpy(temp,ans.c_str());
-					CommunicationHandler CM=myCommunicationHandlerList.getHandler(temp);//找到指定的客户端
-					CM.sendInformation(o);
+					CommunicationHandler *CM=myCommunicationHandlerList.getHandler(temp);//找到指定的客户端
+					CM->sendMessage(o);
 				}
 				else
 				{
@@ -162,12 +162,22 @@ private:
 			if (Database::checklogin(o)==1)//正确，IP上线
 			{
 
+				//test:
+				/*Message temp;
+				strcpy(temp.receiver,"2");
+				strcpy(temp.content,"fds");
+				myOfflineMessageHandler.addMessage(temp);*/
+				//testover
+
+
+
 				queue<Message> tempQueue=myOfflineMessageHandler.getMessage(o.username);
+				myOfflineMessageHandler.deleteMessage(o.username);
 				while (!tempQueue.empty())
 				{
 					Message tempMessage=tempQueue.front();
-					CommunicationHandler CM=myCommunicationHandlerList.getHandler(o.ip);
-					CM.sendInformation(tempMessage);
+					CommunicationHandler *CM=myCommunicationHandlerList.getHandler(o.ip);
+					CM->sendMessage(tempMessage);
 					tempQueue.pop();
 				}
 				return ;
@@ -252,7 +262,8 @@ private:
 		printf("检测到连接请求！\n");
 		CommunicationHandler CH(serSocket,sockClient,addrClient);
 		CH.startConnecting();
-		myCommunicationHandlerList.push_back(CH);
+		Sleep(10);//避免还没有初始化就压入队列了。
+		myCommunicationHandlerList.push_back(&CH);
 
 	//	Sleep(1000);
 	//	CH.endSocket();
@@ -317,7 +328,7 @@ public:
 		serSocket=socket(AF_INET,SOCK_STREAM,0);//妈的注意这句话的位置！
 		SOCKADDR_IN addr;
 		addr.sin_family=AF_INET;
-		addr.sin_addr.S_un.S_addr=inet_addr("10.4.20.138");//服务器IP地址
+		addr.sin_addr.S_un.S_addr=inet_addr("127.0.0.1");//服务器IP地址
 		addr.sin_port=htons(6000);//port
 		bind(serSocket,(SOCKADDR*)&addr,sizeof(SOCKADDR_IN));
 		listen(serSocket,10);
