@@ -9,10 +9,10 @@ Send::Send(QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowFlags(Qt::FramelessWindowHint);//去掉标题栏
-
+    /*设置黑色背景
     QPalette palette(this->palette());
-    palette.setColor(QPalette::Background, Qt::yellow);
-    this->setPalette(palette);
+    palette.setColor(QPalette::Background, Qt::black);
+    this->setPalette(palette);*/
 
 }
 
