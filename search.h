@@ -25,3 +25,4 @@ private:
 };
 
 #endif // SEARCH_H
+
