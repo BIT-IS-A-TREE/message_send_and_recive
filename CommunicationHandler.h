@@ -3,6 +3,7 @@
 #include "User.h"
 #include "Message.h"
 #include "SystemHead.h"
+#include "Translation.h"
 
 class CommunicationHandler
 {
@@ -15,7 +16,7 @@ private:
 		CommunicationHandler *This=(CommunicationHandler *)arg;
 		printf("同客户端：%s发送数据的通道已建立\n",inet_ntoa(This->addrClient.sin_addr));
 		memset(This->msgToSend,0,sizeof(This->msgToSend));
-		strcpy(This->msgToSend,"你好朋友！\n");
+	//	strcpy(This->msgToSend,"你好朋友！\n");
 		while (!This->endFlag)//这个地方可能要加critical
 		{
 			EnterCriticalSection(&This->selfCritical);
@@ -49,8 +50,6 @@ private:
 			LeaveCriticalSection(&critical);
 			Sleep(10);
 		}
-
-		
 		//shutdown(This->sockClient,0);
 
 		printf("接收线程退出！\n");
@@ -104,6 +103,17 @@ public:
 		string temp="";
 		temp+="Repeat@";
 		temp+=o;
+		EnterCriticalSection(&this->selfCritical);
+		strcpy(msgToSend,temp.c_str());
+		LeaveCriticalSection(&this->selfCritical);
+	}
+	void sendRepeat(string o,string o1)
+	{
+		string temp="";
+		temp+="Repeat@";
+		temp+=o;
+		temp+="@";
+		temp+=o1;
 		EnterCriticalSection(&this->selfCritical);
 		strcpy(msgToSend,temp.c_str());
 		LeaveCriticalSection(&this->selfCritical);
