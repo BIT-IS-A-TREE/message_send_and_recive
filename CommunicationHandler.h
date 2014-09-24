@@ -22,7 +22,7 @@ private:
 			EnterCriticalSection(&This->selfCritical);
 			if (strlen(This->msgToSend)!=0)
 			{
-				send(This->sockClient,This->msgToSend,strlen(This->msgToSend)+1,0);
+				send(This->sockConnect,This->msgToSend,strlen(This->msgToSend)+1,0);
 				printf("向客户端%s发送数据：%s\n",inet_ntoa(This->addrClient.sin_addr),This->msgToSend);
 				memset(This->msgToSend,0,sizeof(This->msgToSend));
 			}
@@ -42,7 +42,7 @@ private:
 		while (!This->endFlag)
 		{
 			char buf[10000]; 
-			recv(This->sockClient,buf,10000,0);
+			recv(This->sockConnect,buf,10000,0);
 			printf("从客户端%s接收到数据：%s\n",inet_ntoa(This->addrClient.sin_addr),buf);
 			EnterCriticalSection(&critical);//全局critical
 			msgToBeDealed[rear]=string(buf);
@@ -78,7 +78,7 @@ private:
 		Sleep(1000);
 		
 	//	shutdown(This->sockClient,3);
-		closesocket(This->sockClient);//这个地方close会出错，再考虑考虑。
+		closesocket(This->sockConnect);//这个地方close会出错，再考虑考虑。
 		
 		printf("主线程退出！\n");
 		Sleep(1000);
@@ -93,10 +93,10 @@ private:
 	}
 	
 public:
-	SOCKET sockClient,sockServer;
+	SOCKET sockConnect,sockServer;
 	char msgToSend[10000];
 	SOCKADDR_IN addrClient;
-	CommunicationHandler(SOCKET serSocket,SOCKET client,SOCKADDR_IN addr);
+	//CommunicationHandler(SOCKET serSocket,SOCKET client,SOCKADDR_IN addr);
 	
 	void sendRepeat(string o)
 	{
@@ -147,14 +147,14 @@ public:
 };
 
 
-
-CommunicationHandler::CommunicationHandler(SOCKET serSocket,SOCKET client,SOCKADDR_IN addr)//先要声明一次。
-{
-	this->endFlag=false;
-	this->addrClient=addr;
-	this->sockClient=client;
-	this->sockServer=serSocket;
-}
+//
+//CommunicationHandler::CommunicationHandler(SOCKET serSocket,SOCKET client,SOCKADDR_IN addr)//先要声明一次。
+//{
+//	this->endFlag=false;
+//	this->addrClient=addr;
+//	this->sockClient=client;
+//	this->sockServer=serSocket;
+//}
 
 
 #endif
