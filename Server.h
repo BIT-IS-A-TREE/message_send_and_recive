@@ -262,13 +262,12 @@ private:
 		{
 		printf("启动监听\n");
 		int len=sizeof(SOCKADDR);
-		SOCKADDR_IN addrClient;
-		SOCKET sockClient=accept(serSocket,(SOCKADDR*)&addrClient,&len);
+		CommunicationHandler *CH=new CommunicationHandler();
+		CH->sockConnect=accept(serSocket,(SOCKADDR*)&CH->addrClient,&len);
+		CH->startConnecting();
 		printf("检测到连接请求！\n");
-		CommunicationHandler CH(serSocket,sockClient,addrClient);
-		CH.startConnecting();
-		Sleep(10);//避免还没有初始化就压入队列了。
-		myCommunicationHandlerList.push_back(&CH);
+		Sleep(100);//避免还没有初始化就压入队列了。
+		myCommunicationHandlerList.push_back(CH);
 
 	//	Sleep(1000);
 	//	CH.endSocket();
@@ -333,7 +332,7 @@ public:
 		serSocket=socket(AF_INET,SOCK_STREAM,0);//妈的注意这句话的位置！
 		SOCKADDR_IN addr;
 		addr.sin_family=AF_INET;
-		addr.sin_addr.S_un.S_addr=inet_addr("10.4.20.130");//服务器IP地址
+		addr.sin_addr.S_un.S_addr=inet_addr("127.0.0.1");//服务器IP地址
 		addr.sin_port=htons(6000);//port
 		bind(serSocket,(SOCKADDR*)&addr,sizeof(SOCKADDR_IN));
 		listen(serSocket,10);
