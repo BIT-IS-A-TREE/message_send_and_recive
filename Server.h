@@ -169,8 +169,9 @@ private:
 				myOfflineMessageHandler.addMessage(temp);*/
 				//testover
 
-
-
+				CommunicationHandler *CM=myCommunicationHandlerList.getHandler(o.ip);
+				CM->sendRepeat("Login","1");//往下需要回复。登陆。
+				//短信推送。
 				queue<Message> tempQueue=myOfflineMessageHandler.getMessage(o.username);
 				myOfflineMessageHandler.deleteMessage(o.username);
 				while (!tempQueue.empty())
@@ -203,10 +204,14 @@ private:
 			//查询是否可以注册
 			if (Database::checkregister(o)==1)//正确，允许注册
 			{
+				CommunicationHandler *CM=myCommunicationHandlerList.getHandler(o.ip);
+				CM->sendRepeat("Register","1");
 				return ;
 			}
 			else
 			{
+				CommunicationHandler *CM=myCommunicationHandlerList.getHandler(o.ip);
+				CM->sendRepeat("Register","0");
 				printf("用户注册失败\n");
 			}
 			return ;
@@ -253,7 +258,7 @@ private:
 	static DWORD WINAPI WaitForConnection(LPVOID pParam)
 	{
 		Sleep(50);
-	while (1)
+		while (1)
 		{
 		printf("启动监听\n");
 		int len=sizeof(SOCKADDR);
@@ -286,7 +291,7 @@ private:
 		printf("短信处理模块开始运行！\n");
 		while (1)
 		{
-			EnterCriticalSection(&critical);
+			EnterCriticalSection(&critical);	
 			while (head!=rear)//队列不为空
 			{
 				string temp=msgToBeDealed[head];
@@ -328,7 +333,7 @@ public:
 		serSocket=socket(AF_INET,SOCK_STREAM,0);//妈的注意这句话的位置！
 		SOCKADDR_IN addr;
 		addr.sin_family=AF_INET;
-		addr.sin_addr.S_un.S_addr=inet_addr("127.0.0.1");//服务器IP地址
+		addr.sin_addr.S_un.S_addr=inet_addr("10.4.20.130");//服务器IP地址
 		addr.sin_port=htons(6000);//port
 		bind(serSocket,(SOCKADDR*)&addr,sizeof(SOCKADDR_IN));
 		listen(serSocket,10);
