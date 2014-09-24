@@ -1,0 +1,38 @@
+static void sendMessage(Message o)
+    {
+        char buf[1000];
+
+        string temp;
+        temp="";
+        temp += "Message@";
+        sprintf(buf, "%d", o.IssetTime);
+        temp+=buf;
+              //  temp+=string(o.IssetTime);
+                temp+='@';
+                sprintf(buf, "%lld", o.setTime);
+                temp+=buf;
+                //temp+=string(o.setTime);
+                temp+='@';
+                temp+=o.receiver;
+                temp+='@';
+                temp+=o.sender;
+                temp+='@';
+                sprintf(buf, "%d", o.sendRceiveFlag);
+                temp+=buf;
+                //temp+=string(o.sendRceiveFlag);
+                temp+='@';
+                sprintf(buf, "%d", o.lmesFlag);
+                temp+=buf;
+                //temp+=string(o.lmesFlag);
+                temp+='@';
+                sprintf(buf, "%d", o.lmesSt);
+                temp+=buf;
+                //temp+=string(o.lmesSt);
+                temp+='@';
+                sprintf(buf, "%lld", o.time);
+                temp+=buf;
+//              temp+=string(o.time);
+                temp+='@';
+                temp+=o.content;
+        strcpy(sendBuf,temp.c_str());
+    }
