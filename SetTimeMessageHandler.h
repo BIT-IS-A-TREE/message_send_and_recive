@@ -23,13 +23,13 @@ private:
 			if (SetTimeMessageQueueTop!=0)
 			{
 				EnterCriticalSection(&selfCritical);		
-				Message	headMessage=SetTimeMessageQueue[SetTimeMessageQueueTop];			
+				Message	headMessage=SetTimeMessageQueue[SetTimeMessageQueueTop-1];			
 				LeaveCriticalSection(&selfCritical);
 				//取出定时短信队首。
 
 				time(&nowTime);//读取本地时间。
 
-				if (difftime(nowTime,headMessage.setTime)<=100)//到时时间了。
+				if (fabs(difftime(nowTime,headMessage.setTime))<=3.0)//到时时间了。
 				{
 					headMessage.IssetTime=0;
 					EnterCriticalSection(&critical);
