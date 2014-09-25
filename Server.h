@@ -103,7 +103,7 @@ private:
 					char tempIP[1000];
 					strcpy(tempIP,repeatIP.c_str());
 					CommunicationHandler *repeatCM=myCommunicationHandlerList.getHandler(tempIP);
-					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("向B发送的短信因对方已经关机尚未送达\n",tempIP));
+					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("Not send to B!\n",tempIP));
 
 				}
 				else if (ans!="0.0.0.0")//存在且在线
@@ -119,7 +119,7 @@ private:
 					char tempIP[1000];
 					strcpy(tempIP,repeatIP.c_str());
 					CommunicationHandler *repeatCM=myCommunicationHandlerList.getHandler(tempIP);
-					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("向B发送的短信成功送达\n",tempIP));
+					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("Send to B!\n",tempIP));
 				}
 				else
 				{
@@ -152,6 +152,7 @@ private:
 
 				Database::storemessage(o);//短信存入数据库
 				//加入到定时短信队列！
+				printf("加入定时短信队列！\n");
 				mySetTimeMessageHandler.addMessage(o);
 
 			}
@@ -188,6 +189,7 @@ private:
 				CommunicationHandler *CM=myCommunicationHandlerList.getHandler(o.ip);
 				CM->sendRepeat("Login","1");//往下需要回复。登陆。
 				//短信推送。
+				Sleep(500);
 				queue<Message> tempQueue=myOfflineMessageHandler.getMessage(o.username);
 				myOfflineMessageHandler.deleteMessage(o.username);
 				while (!tempQueue.empty())
@@ -202,7 +204,7 @@ private:
 					char tempIP[1000];
 					strcpy(tempIP,repeatIP.c_str());
 					CommunicationHandler *repeatCM=myCommunicationHandlerList.getHandler(tempIP);
-					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("向B发送的短信经过延时成功送达\n",tempIP));
+					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("Send to B!\n",tempIP));
 				}
 				return ;
 			}
@@ -266,16 +268,19 @@ private:
 		//下线信息提醒Logout@username@password@ip
 		if (strcmp(token,"Logout")==0)
 		{
+
 			User o;
 			token = strtok (NULL, "@");
-			strcpy(o.username,token);//username
-			token = strtok (NULL, "@");
-			strcpy(o.password,token);//password
-			token = strtok (NULL, "@");
 			strcpy(o.ip,token);//ip;
-			Database::logout(o);
+			//读取用户数据
+			Sleep(500);
+			Database::logout(string(o.ip));//让他下线
+			Sleep(50);
+		 	myCommunicationHandlerList.DeleteHandler(o.ip);//
+			Sleep(50);
 			return ;
 		}
+		
 		
 	
 	}
@@ -357,7 +362,7 @@ public:
 		serSocket=socket(AF_INET,SOCK_STREAM,0);//妈的注意这句话的位置！
 		SOCKADDR_IN addr;
 		addr.sin_family=AF_INET;
-		addr.sin_addr.S_un.S_addr=inet_addr("127.0.0.1");//服务器IP地址
+		addr.sin_addr.S_un.S_addr=inet_addr("10.4.20.130");//服务器IP地址
 		addr.sin_port=htons(6000);//port
 		bind(serSocket,(SOCKADDR*)&addr,sizeof(SOCKADDR_IN));
 		listen(serSocket,10);
