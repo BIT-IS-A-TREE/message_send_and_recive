@@ -47,9 +47,11 @@ public:
 		{
 			if ((*b)->addrClient.sin_addr.S_un.S_addr==inet_addr(IP))
 			{
-				b=myList.erase(b);
+				(*b)->addrClient.sin_addr.S_un.S_addr=inet_addr("255.255.255.255");//屏蔽掉改客户端！
+				
 			}
 		}
+		printf("移除IP地址为:%s的客户端的Handler\n",IP); 
 	}
 
 };
