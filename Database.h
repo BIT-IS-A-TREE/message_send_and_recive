@@ -89,13 +89,13 @@ public:
 				return 0;
 			}
 		}
-		string common="INSERT INTO key_ip VALUES ('"+number+"','"+keyword+"','"+ipaddress+"')"; //生成SQL语句
+		string common="INSERT INTO key_ip VALUES ('"+number+"','"+keyword+"','"+"1.1.1.1"+"')"; //生成SQL语句
 		char *command=const_cast<char*>(common.data());   //STRING转化为char*
 		exe_sql(command);    //执行更新SQL语句
 		num++;
 		key[num][0]=number;
 		key[num][1]=keyword;
-		key[num][2]=ipaddress;
+		key[num][2]="1.1.1.1";
 		return 1;
 	}
 
@@ -123,11 +123,10 @@ public:
 	}
 
 	//检查用户能否退出成功,1表示退出成功，0表示退出失败
-	int static logout(User user){
+	int static logout(string ip){
 		int row;
-		string number(user.username);
 		for(row=1;row<=num;row++){
-			if(key[row][0].compare(number)==0){ //找到对应帐号,退出帐号ip改为1.1.1.1
+			if(key[row][2].compare(ip)==0){ //找到对应帐号,退出帐号ip改为1.1.1.1
 				key[row][2]="1.1.1.1";
 				/*
 					更新数据库
@@ -185,6 +184,10 @@ private:
 	//获得密码表内数据，将数据拷贝到key的二维数组中
 	void get_phone_key_ip(){
 		num=0;
+
+
+		char *temp_sql="DELETE FROM key_ip";
+//		exe_sql(temp_sql);
 		char *sql="UPDATE key_ip SET ip= '1.1.1.1'";
 		exe_sql(sql);
 
