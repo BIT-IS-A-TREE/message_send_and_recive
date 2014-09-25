@@ -103,7 +103,10 @@ private:
 					char tempIP[1000];
 					strcpy(tempIP,repeatIP.c_str());
 					CommunicationHandler *repeatCM=myCommunicationHandlerList.getHandler(tempIP);
-					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("Not send to B!\n",tempIP));
+					string tempString="Message send to ";
+					tempString+=string(o.receiver);
+					tempString+=" failed because of user offline!";
+					repeatCM->sendMessage(TranslationHandler::getRepeatMessage(tempString,tempIP));
 
 				}
 				else if (ans!="0.0.0.0")//存在且在线
@@ -118,8 +121,11 @@ private:
 					string repeatIP=Database::return_ip_by_telephonenumber(string(o.sender));
 					char tempIP[1000];
 					strcpy(tempIP,repeatIP.c_str());
+					string tempString="Message Successfully send to ";
+					tempString+=string(o.receiver);
+					tempString+=" !";
 					CommunicationHandler *repeatCM=myCommunicationHandlerList.getHandler(tempIP);
-					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("Send to B!\n",tempIP));
+					repeatCM->sendMessage(TranslationHandler::getRepeatMessage(tempString,tempIP));
 				}
 				else
 				{
@@ -204,7 +210,10 @@ private:
 					char tempIP[1000];
 					strcpy(tempIP,repeatIP.c_str());
 					CommunicationHandler *repeatCM=myCommunicationHandlerList.getHandler(tempIP);
-					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("Send to B!\n",tempIP));
+					string tempString="Message delayed send to ";
+					tempString+=string(o.username);
+					tempString+=" !";
+					repeatCM->sendMessage(TranslationHandler::getRepeatMessage(tempString,tempIP));
 				}
 				return ;
 			}
