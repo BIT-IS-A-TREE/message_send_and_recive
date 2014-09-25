@@ -44,7 +44,7 @@ public:
 		string sender(message_temp.sender);
 		string receiver(message_temp.receiver);
 		string time(ctime(&message_temp.time));
-		int isendreceiveflag=message_temp.sendRceiveFlag;
+		int isendreceiveflag=message_temp.sendRceiveFlag;;;;;
 		char temp[50];
 		sprintf(temp, "%d", isendreceiveflag);
 		string sisendreceiveflag=temp;
@@ -185,7 +185,10 @@ private:
 	//获得密码表内数据，将数据拷贝到key的二维数组中
 	void get_phone_key_ip(){
 		num=0;
-		char *sql="select * from key_ip";
+		char *sql="UPDATE key_ip SET ip= '1.1.1.1'";
+		exe_sql(sql);
+
+		sql="select * from key_ip";
 		MYSQL my_connection; /*这是一个数据库连接*/ 
 		int res; /*执行sql語句后的返回标志*/ 
 		MYSQL_RES *res_ptr; /*指向查询结果的指针*/ 
@@ -210,22 +213,22 @@ private:
 				/*取得結果的行数和*/ 
 				column = mysql_num_fields(res_ptr);
 				row = (int)mysql_num_rows(res_ptr) + 1; 
-//				printf("查询到 %lu 行 \n", row); 
+				printf("查询到 %lu 行 \n", row); 
 				/*输出結果的字段名*/ 
-//				for (i = 0; field = mysql_fetch_field(res_ptr); i++) 
-//					printf("%st ", field->name); 
-//				printf("\n"); 
+				for (i = 0; field = mysql_fetch_field(res_ptr); i++) 
+					printf("%s ", field->name); 
+				printf("\n"); 
 				/*按行输出結果*/ 
 				for (i = 1; i < row; i++) { 
+					num++;
 					result_row = mysql_fetch_row(res_ptr); 
 					for (j = 0; j < column; j++) 
 					{
-						num++;
 						key[num][j]=result_row[j];
-	//					printf("%s ", result_row[j]); 
+						printf("%s ", result_row[j]); 
 					}
-//					printf("\n"); 
-//				} 
+					printf("\n"); 
+				} 
 				
 				/*不要忘了关闭连接*/ 
 				mysql_close(&my_connection); 
@@ -233,7 +236,7 @@ private:
 		} 
 	}
 
-	}
 };
+
 
 #endif
