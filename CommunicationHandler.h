@@ -44,6 +44,26 @@ private:
 			char buf[10000]; 
 			recv(This->sockConnect,buf,10000,0);
 			printf("从客户端%s接收到数据：%s\n",inet_ntoa(This->addrClient.sin_addr),buf);
+
+			//end
+			char temp[1000];
+			strcpy(temp,buf);
+			char *token=strtok(temp,"@");
+			if (strcmp(token,"Logout")==0)
+			{
+				This->endFlag=1;
+				Sleep(10);
+				EnterCriticalSection(&critical);//全局critical
+				msgToBeDealed[rear]=string(buf);
+				rear++;
+				LeaveCriticalSection(&critical);
+				Sleep(10);
+				break;
+			}
+
+			
+			//endover
+
 			EnterCriticalSection(&critical);//全局critical
 			msgToBeDealed[rear]=string(buf);
 			rear++;
@@ -51,8 +71,9 @@ private:
 			Sleep(10);
 		}
 		//shutdown(This->sockClient,0);
-
+		
 		printf("接收线程退出！\n");
+
 	}
 	static void Connecting(void *arg)
 	{
@@ -126,6 +147,7 @@ public:
 		strcpy(msgToSend,temp.c_str());
 		LeaveCriticalSection(&this->selfCritical);;
 	}
+	
 	//void sendInformation(char * o)
 	//{
 	//	//string temp(o);
@@ -155,6 +177,8 @@ public:
 //	this->sockClient=client;
 //	this->sockServer=serSocket;
 //}
+
+
 
 
 #endif
