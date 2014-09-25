@@ -27,11 +27,11 @@ private:
 				LeaveCriticalSection(&selfCritical);
 				//取出定时短信队首。
 
-				localtime(&nowTime);//读取本地时间。
+				time(&nowTime);//读取本地时间。
 
-				if (headMessage.setTime==nowTime)
+				if (difftime(nowTime,headMessage.setTime)<=100)//到时时间了。
 				{
-					headMessage.IssetTime=false;
+					headMessage.IssetTime=0;
 					EnterCriticalSection(&critical);
 					msgToBeDealed[rear]=TranslationHandler::messageToString(headMessage);
 					rear++;
@@ -52,7 +52,14 @@ private:
 	{
 		Message *a1=(Message *)a;
 		Message *b1=(Message *)b;
-		return a1->setTime-b1->setTime;
+		if (a1->setTime-b1->setTime>0)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
 	}
 public:
 	static void startWorking()
