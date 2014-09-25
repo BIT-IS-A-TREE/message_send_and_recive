@@ -99,11 +99,11 @@ private:
 					printf("加入离线队列\n");
 					
 					//回执
-					string repeatIP=Database::return_ip_by_telephonenumber(string(o.sender));
+				/*	string repeatIP=Database::return_ip_by_telephonenumber(string(o.sender));
 					char tempIP[1000];
 					strcpy(tempIP,repeatIP.c_str());
 					CommunicationHandler *repeatCM=myCommunicationHandlerList.getHandler(tempIP);
-					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("向B发送的短信因对方已经关机尚未送达\n",tempIP));
+					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("Not send to B!\n",tempIP));*/
 
 				}
 				else if (ans!="0.0.0.0")//存在且在线
@@ -115,11 +115,11 @@ private:
 					CM->sendMessage(o);
 
 					//回执
-					string repeatIP=Database::return_ip_by_telephonenumber(string(o.sender));
+					/*string repeatIP=Database::return_ip_by_telephonenumber(string(o.sender));
 					char tempIP[1000];
 					strcpy(tempIP,repeatIP.c_str());
 					CommunicationHandler *repeatCM=myCommunicationHandlerList.getHandler(tempIP);
-					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("向B发送的短信成功送达\n",tempIP));
+					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("Send to B!\n",tempIP));*/
 				}
 				else
 				{
@@ -152,6 +152,7 @@ private:
 
 				Database::storemessage(o);//短信存入数据库
 				//加入到定时短信队列！
+				printf("加入定时短信队列！\n");
 				mySetTimeMessageHandler.addMessage(o);
 
 			}
@@ -198,11 +199,11 @@ private:
 					tempQueue.pop();
 
 					//回执
-					string repeatIP=Database::return_ip_by_telephonenumber(string(tempMessage.sender));
+				/*	string repeatIP=Database::return_ip_by_telephonenumber(string(tempMessage.sender));
 					char tempIP[1000];
 					strcpy(tempIP,repeatIP.c_str());
 					CommunicationHandler *repeatCM=myCommunicationHandlerList.getHandler(tempIP);
-					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("向B发送的短信经过延时成功送达\n",tempIP));
+					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("Send to B!\n",tempIP));*/
 				}
 				return ;
 			}
@@ -357,7 +358,7 @@ public:
 		serSocket=socket(AF_INET,SOCK_STREAM,0);//妈的注意这句话的位置！
 		SOCKADDR_IN addr;
 		addr.sin_family=AF_INET;
-		addr.sin_addr.S_un.S_addr=inet_addr("127.0.0.1");//服务器IP地址
+		addr.sin_addr.S_un.S_addr=inet_addr("10.4.20.136");//服务器IP地址
 		addr.sin_port=htons(6000);//port
 		bind(serSocket,(SOCKADDR*)&addr,sizeof(SOCKADDR_IN));
 		listen(serSocket,10);
