@@ -17,6 +17,7 @@
 #include <mysql.h>/*注意要包含这个头文件*/ 
 #include <string>
 #include<cstdio>
+#include <sstream>
 #include<ctime>
 //#include "Message.h"
 //#include "User.h"
