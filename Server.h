@@ -70,7 +70,7 @@ private:
 			{
 				o.IssetTime=0;//是否定时
 				token = strtok (NULL, "@");
-				o.setTime=atoi(token);//定时时间
+				o.setTime=_atoi64(token);//定时时间
 				token = strtok (NULL, "@");
 				strcpy(o.receiver,token);//收件人
 				token = strtok (NULL, "@");
@@ -82,20 +82,29 @@ private:
 				token = strtok (NULL, "@");
 				o.lmesSt=atoi(token);//长短信顺序标识
 				token = strtok (NULL, "@");
-				o.time=atoi(token);//收发时间
-
+				//o.time=_i64toa(token);//收发时间
+				o.time=_atoi64(token);
 				token =strtok(NULL,"");//短信内容
 				strcpy(o.content,token);
 				//短信内容保存完毕！
 				
 
-				
+
+				//恢复,要改，调整,这里是O.sender要改成O.reciver
 				Database::storemessage(o);//存入数据库
 				string ans=Database::return_ip_by_telephonenumber(string(o.receiver));//查询指定ip状况，查询发现是0.0.0.0。未注册！！！
 				if (ans=="1.1.1.1")//不在线，调出OFFline，加入
 				{
 					myOfflineMessageHandler.addMessage(o);//加入完毕
 					printf("加入离线队列\n");
+					
+					//回执
+					string repeatIP=Database::return_ip_by_telephonenumber(string(o.sender));
+					char tempIP[1000];
+					strcpy(tempIP,repeatIP.c_str());
+					CommunicationHandler *repeatCM=myCommunicationHandlerList.getHandler(tempIP);
+					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("向B发送的短信因对方已经关机尚未送达\n",tempIP));
+
 				}
 				else if (ans!="0.0.0.0")//存在且在线
 				{
@@ -104,6 +113,13 @@ private:
 					strcpy(temp,ans.c_str());
 					CommunicationHandler *CM=myCommunicationHandlerList.getHandler(temp);//找到指定的客户端
 					CM->sendMessage(o);
+
+					//回执
+					string repeatIP=Database::return_ip_by_telephonenumber(string(o.sender));
+					char tempIP[1000];
+					strcpy(tempIP,repeatIP.c_str());
+					CommunicationHandler *repeatCM=myCommunicationHandlerList.getHandler(tempIP);
+					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("向B发送的短信成功送达\n",tempIP));
 				}
 				else
 				{
@@ -116,7 +132,7 @@ private:
 			{
 				o.IssetTime=1;//是否定时
 				token = strtok (NULL, "@");
-				o.setTime=atoi(token);//定时时间
+				o.setTime=_atoi64(token);//定时时间
 				token = strtok (NULL, "@");
 				strcpy(o.receiver,token);//收件人
 				token = strtok (NULL, "@");
@@ -128,9 +144,9 @@ private:
 				token = strtok (NULL, "@");
 				o.lmesSt=atoi(token);//长短信顺序标识
 				token = strtok (NULL, "@");
-				o.time=atoi(token);//收发时间
-
-				token =strtok(NULL,"");//短信内容
+				o.time=_atoi64(token);//收发时间
+				token =strtok(NULL,"");
+				//短信内容
 				strcpy(o.content,token);
 				//短信内容保存完毕！
 
@@ -180,11 +196,20 @@ private:
 					CommunicationHandler *CM=myCommunicationHandlerList.getHandler(o.ip);
 					CM->sendMessage(tempMessage);
 					tempQueue.pop();
+
+					//回执
+					string repeatIP=Database::return_ip_by_telephonenumber(string(tempMessage.sender));
+					char tempIP[1000];
+					strcpy(tempIP,repeatIP.c_str());
+					CommunicationHandler *repeatCM=myCommunicationHandlerList.getHandler(tempIP);
+					repeatCM->sendMessage(TranslationHandler::getRepeatMessage("向B发送的短信经过延时成功送达\n",tempIP));
 				}
 				return ;
 			}
 			else
 			{
+				CommunicationHandler *CM=myCommunicationHandlerList.getHandler(o.ip);
+				CM->sendRepeat("Login","0");//往下需要回复。登陆。
 				printf("用户登录失败！\n");
 			}
 			return ;
