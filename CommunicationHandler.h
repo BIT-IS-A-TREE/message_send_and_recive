@@ -126,6 +126,7 @@ public:
 		strcpy(msgToSend,temp.c_str());
 		LeaveCriticalSection(&this->selfCritical);;
 	}
+	
 	//void sendInformation(char * o)
 	//{
 	//	//string temp(o);
@@ -155,6 +156,8 @@ public:
 //	this->sockClient=client;
 //	this->sockServer=serSocket;
 //}
+
+
 
 
 #endif
