@@ -75,8 +75,8 @@ public:
 		memset(temp.sender,0,sizeof(temp.sender));
 		strcpy(temp.sender,"10086");
 		temp.sendRceiveFlag=1;
-		time(&temp.setTime);
-		time(&temp.time);
+		temp.setTime=time(&temp.setTime);
+		temp.time=time(&temp.time);
 		return temp;
 	}
 
