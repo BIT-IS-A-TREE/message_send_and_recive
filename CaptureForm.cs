@@ -62,15 +62,15 @@ namespace Greenshot.Forms
         }
 
         /// <summary>
-        /// 绘图矩形起点X
+        /// 第一次绘图矩形起点X
         /// </summary>
         private int _mX;
         /// <summary>
-        /// 绘图矩形起点Y
+        /// 第一次绘图矩形起点Y
         /// </summary>
         private int _mY;
         /// <summary>
-        /// 左下角的点。
+        /// 左上角的点。
         /// </summary>
         private int _cX, _cY;
         /// <summary>
@@ -82,12 +82,13 @@ namespace Greenshot.Forms
         /// </summary>
         private int _fY;
         /// <summary>
-        /// 第二次X
+        /// 第二次鼠标起点X
         /// </summary>
         private int secStartX;
         /// <summary>
-        /// 第二次Y；
+        /// 第二次鼠标起点Y；
         /// </summary>
+        private int lastX, lastY;
         private int secStartY;
         private Point _mouseMovePos = Point.Empty;
         private Point _cursorPos = Point.Empty;
@@ -460,14 +461,20 @@ namespace Greenshot.Forms
                 _fY = tmpCursorLocation.Y;
                 width = Math.Abs(_fX - _mX);
                 height = Math.Abs(_fY - _mY);
-                _cX = _fX > _mX ? _mX : _fX;//左下角的点。
-                _cY = _fY > _mY ? _mY : _fX;//左下角的点。
-
+                lastX = _fX > _mX ? _mX : _fX;
+                lastY=_fY > _mY ? _mY : _fX;
+                _cX = lastX;//左上角的点。
+                _cY = lastY;//左上角的点。
+                
 
             }
             else
             {
                 startMoving = false;
+                Point tmpCursorLocation = WindowCapture.GetCursorLocationRelativeToScreenBounds();
+                lastX += tmpCursorLocation.X - secStartX;
+                lastY += tmpCursorLocation.Y - secStartY;
+                MessageBox.Show("确定？");
             }
             //if (_mouseDown)
             //{
@@ -532,8 +539,8 @@ namespace Greenshot.Forms
                 Point tmpCursorLocation = WindowCapture.GetCursorLocationRelativeToScreenBounds();
                 int tempx = tmpCursorLocation.X;
                 int tempy = tmpCursorLocation.Y;
-                _cX = _fX > _mX ? _mX : _fX;//左下角的点。
-                _cY = _fY > _mY ? _mY : _fX;//左下角的点。
+                _cX = lastX;//左上角的点。
+                _cY = lastY;//左上角的点。
                 _cX -= secStartX - tempx;
                 _cY -= secStartY - tempy;
             }
@@ -561,7 +568,7 @@ namespace Greenshot.Forms
         protected override void Animate()
         {
             Rectangle invalidateRectangle;
-            if (up>=2)
+            if (Down>=2)
             {
                // _mouseMovePos = FixMouseCoordinates(User32.GetCursorLocation());//返回更新鼠标位置。当前的坐标的点。
               //  _mouseMovePos = WindowCapture.GetLocationRelativeToScreenBounds(_mouseMovePos);
